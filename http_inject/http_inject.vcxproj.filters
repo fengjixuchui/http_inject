@@ -24,6 +24,9 @@
     <ClCompile Include="forward.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="302_redirect.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header.h">

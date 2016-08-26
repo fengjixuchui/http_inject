@@ -29,10 +29,14 @@ int main()
 		exit(1);
 	}
 	/* Backwrad? Forward? */
-	printf("Forward : 1, Backward : 2 : ");
+	printf("Forward : 1, Backward : 2, 302 Redirect : 3");
 	scanf_s("%d", &BlockType);
-	if (BlockType == 1 || BlockType == 2 || BlockType == 3)
-		printf("!\n");
+	if (BlockType == 1)
+		printf("Forward Start\n");
+	else if (BlockType == 2)
+		printf("Backward Start\n");
+	else if (BlockType == 3)
+		printf("302 redirect Start\n");
 	else
 	{
 		fprintf(stderr, "error!\n");
@@ -89,7 +93,7 @@ int main()
 		else if (BlockType == 2)
 			packet_handler_foward(fp, pkt_data, header);
 		else if (BlockType == 3)
-			packet_http_handler_redirect(fp, pkt_data, header->len);
+			packet_handler_redirect(fp, pkt_data, header->len);
 	}
 	pcap_close(fp);    // 네트워크 디바이스 핸들 종료  
 	return 0;

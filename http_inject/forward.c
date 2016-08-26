@@ -29,8 +29,8 @@ int packet_handler_foward(pcap_t *fp, u_char *pkt_data, struct pcap_pkthdr *head
 
 	struct pseudo_header *psh;						// pseudo_header 구조체 선언
 	psh = (struct pseudo_header *)malloc(sizeof(pseudo_header));
-	psh->ip_dst_addr, ih->ip_dst_addr;								// IP 도착지
-	psh->ip_src_addr = ih->ip_src_addr;								// IP 시작지
+	memcpy(&psh->ip_dst_addr, &ih->ip_dst_addr, sizeof(ih->ip_dst_addr));
+	memcpy(&psh->ip_src_addr, &ih->ip_src_addr, sizeof(ih->ip_src_addr));
 	psh->placeholder = 0x00;										// Reserve 항상 0
 	psh->protocol = ih->ip_protocol;								// IP 프로토콜	
 	psh->tcp_length = sizeof(tcp_header) + (u_short)strlen(Data); // TCP header + Data len
