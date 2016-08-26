@@ -31,10 +31,8 @@ int main()
 	/* Backwrad? Forward? */
 	printf("Forward : 1, Backward : 2 : ");
 	scanf_s("%d", &BlockType);
-	if (BlockType == 2)
-		printf("Backward start\n\n");
-	else if (BlockType == 1)
-		printf("Forward start\n\n");
+	if (BlockType == 1 || BlockType == 2 || BlockType == 3)
+		printf("!\n");
 	else
 	{
 		fprintf(stderr, "error!\n");
@@ -86,10 +84,12 @@ int main()
 	/* 캡처 시작 */
 	while ((res = pcap_next_ex(fp, &header, (const u_char **)&pkt_data)) >= 0)
 	{
-		if(BlockType >> 1)
+		if(BlockType == 1)
 			packet_handler_backward(fp, pkt_data, header);
-		else
+		else if (BlockType == 2)
 			packet_handler_foward(fp, pkt_data, header);
+		else if (BlockType == 3)
+			packet_http_handler_redirect(fp, pkt_data, header->len);
 	}
 	pcap_close(fp);    // 네트워크 디바이스 핸들 종료  
 	return 0;

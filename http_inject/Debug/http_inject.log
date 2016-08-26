@@ -1,4 +1,0 @@
-﻿  backward.c
-d:\http_inject\http_inject\backward.c(15): warning C4047: '==': 'tcp_header *' differs in levels of indirection from 'unsigned int'
-  http_inject.vcxproj -> D:\http_inject\Debug\http_inject.exe
-  http_inject.vcxproj -> D:\http_inject\Debug\http_inject.pdb (Full PDB)

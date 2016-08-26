@@ -28,7 +28,7 @@ int packet_handler_backward(pcap_t *fp, u_char *pkt_data, struct pcap_pkthdr *he
 	ip_checksum_backward(ih);
 
 	/* Change Ethernet Address */
-	change_MAC_Addr_backward(eh);
+	change_MAC_Addr(eh);
 
 	struct pseudo_header *psh;						// pseudo_header 구조체 선언
 	psh = (struct pseudo_header *)malloc(sizeof(pseudo_header));
@@ -46,7 +46,7 @@ int packet_handler_backward(pcap_t *fp, u_char *pkt_data, struct pcap_pkthdr *he
 	packet_size = 54 + strlen(Data);						// 61 bytes
 	packet = (u_char *)malloc(packet_size);
 	memcpy(packet, pkt_data, 14);							// Ethernet
-	memcpy(packet + 14, p, 20);		// IP
+	memcpy(packet + 14, ih, 20);		// IP
 	memcpy(packet + 34, tcp, 20);	// TCP
 	memcpy(packet + 54, Data, strlen(Data));				// Data
 
@@ -112,7 +112,7 @@ void tcp_checksum_backward(struct tcp_header *tcp, struct pseudo_header *psh, st
 	tcp->checksum = (u_short)sum;
 }
 
-void change_MAC_Addr_backward(struct ether_header *eh)
+void change_MAC_Addr(struct ether_header *eh)
 {
 	u_char temp[6];
 	/* chagne MAC Addr */
