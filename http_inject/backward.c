@@ -7,19 +7,19 @@ int packet_handler_backward(pcap_t *fp, u_char *pkt_data, struct pcap_pkthdr *he
 {
 	struct ether_header *eh;
 	eh = (struct ether_header *)(pkt_data);
-	struct ip_header *ih;							// IP ±¸Á¶Ã¼ ¼±¾ğ
+	struct ip_header *ih;							// IP êµ¬ì¡°ì²´ ì„ ì–¸
 	ih = (struct ip_header *)(pkt_data + 14);
-	struct tcp_header *tcp;							// tcp ±¸Á¶Ã¼ ¼±¾ğ
+	struct tcp_header *tcp;							// tcp êµ¬ì¡°ì²´ ì„ ì–¸
 	tcp = (struct tcp_header *)(pkt_data + 34);
 
-	if (pkt_data == NULL || tcp == 0xccccccee)		// ÆĞÅ¶µµ ¾È°¡Á®¿Í ³õ°í ÀÌ ÇÔ¼ö·Î ¿À¸é ´Ù Æ¨°Ü³¿
+	if (pkt_data == NULL || tcp == 0xccccccee)		// íŒ¨í‚·ë„ ì•ˆê°€ì ¸ì™€ ë†“ê³  ì´ í•¨ìˆ˜ë¡œ ì˜¤ë©´ ë‹¤ íŠ•ê²¨ëƒ„
 		return 0;
-	if (ntohs(tcp->dst_port) != 0x0050)				// http Åë½ÅÀÌ ¾Æ´Ï¸é ¹ö¸²
+	if (ntohs(tcp->dst_port) != 0x0050)				// http í†µì‹ ì´ ì•„ë‹ˆë©´ ë²„ë¦¼
 		return 0;
-	char get_buf[12];										// Get¹®ÀÚ¸¦ ´ã´Â ÀÓ½Ã ¹è¿­
+	char get_buf[12];										// Getë¬¸ìë¥¼ ë‹´ëŠ” ì„ì‹œ ë°°ì—´
 	memcpy(get_buf, (pkt_data + 54), sizeof(get_buf));
 	get_buf[11] = '\0';
-	if (strncmp(get_buf, "GET / HTTP/", sizeof(get_buf) - 1))	// HTTPÀÇ GET ÀÎÁö È®ÀÎ
+	if (strncmp(get_buf, "GET / HTTP/", sizeof(get_buf) - 1))	// HTTPì˜ GET ì¸ì§€ í™•ì¸
 		return 0;
 
 	char *Data = "blocked\0";
@@ -30,12 +30,19 @@ int packet_handler_backward(pcap_t *fp, u_char *pkt_data, struct pcap_pkthdr *he
 	/* Change Ethernet Address */
 	change_MAC_Addr(eh);
 
-	struct pseudo_header *psh;						// pseudo_header ±¸Á¶Ã¼ ¼±¾ğ
+	struct pseudo_header *psh;						// pseudo_header êµ¬ì¡°ì²´ ì„ ì–¸
 	psh = (struct pseudo_header *)malloc(sizeof(pseudo_header));
+<<<<<<< HEAD
 	memcpy(&psh->ip_dst_addr, &ih->ip_dst_addr, sizeof(ih->ip_dst_addr));
 	memcpy(&psh->ip_src_addr, &ih->ip_src_addr, sizeof(ih->ip_src_addr));
 	psh->placeholder = 0x00;										// Reserve Ç×»ó 0
 	psh->protocol = ih->ip_protocol;								// IP ÇÁ·ÎÅäÄİ	
+=======
+	psh->ip_dst_addr = ih->ip_dst_addr;								// IP ë„ì°©ì§€
+	psh->ip_src_addr = ih->ip_src_addr;								// IP ì‹œì‘ì§€
+	psh->placeholder = 0x00;										// Reserve í•­ìƒ 0
+	psh->protocol = ih->ip_protocol;								// IP í”„ë¡œí† ì½œ	
+>>>>>>> origin/master
 	psh->tcp_length = sizeof(tcp_header) + (u_short)strlen(Data); // TCP header + Data len
 																  /* TCP checksum */
 	tcp_checksum_backward(tcp, psh, header);
@@ -65,7 +72,7 @@ void ip_checksum_backward(struct ip_header *ih)
 	ih->ip_src_addr = ih->ip_dst_addr;
 	ih->ip_dst_addr = temp;
 
-	ih->ip_total_length = 0x2F00;		// 0x2F00 ÃßÈÄ¿¡ ntohs¼öÁ¤
+	ih->ip_total_length = 0x2F00;		// 0x2F00 ì¶”í›„ì— ntohsìˆ˜ì •
 
 	u_short *p = (u_short *)ih;
 	u_int sum = 0;
@@ -101,12 +108,12 @@ void tcp_checksum_backward(struct tcp_header *tcp, struct pseudo_header *psh, st
 	tcp->flags = 0x11;
 	for (i = 0; i < 5; i++)
 		sum += ntohs(*psh_data++);
-	sum += ntohs(*psh_data);			// psh_data ÁÖ¼Ò°¡ ÀÌ»óÇÑ °ªÀ¸·Î °¡´Â °Å ¹æÁö
+	sum += ntohs(*psh_data);			// psh_data ì£¼ì†Œê°€ ì´ìƒí•œ ê°’ìœ¼ë¡œ ê°€ëŠ” ê±° ë°©ì§€
 
 	for (i = 0; i < 9; i++)
 		sum += ntohs(*tcp_data++);
 
-	sum += ntohs(*tcp_data);			// tcp_data ÁÖ¼Ò°¡ ÀÌ»óÇÑ °ªÀ¸·Î °¡´Â °Å ¹æÁö	
+	sum += ntohs(*tcp_data);			// tcp_data ì£¼ì†Œê°€ ì´ìƒí•œ ê°’ìœ¼ë¡œ ê°€ëŠ” ê±° ë°©ì§€	
 	sum = (sum >> 16) + (sum & 0xffff);
 	sum = ~sum;
 	tcp->checksum = (u_short)sum;
