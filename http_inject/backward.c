@@ -32,17 +32,15 @@ int packet_handler_backward(pcap_t *fp, u_char *pkt_data, struct pcap_pkthdr *he
 
 	struct pseudo_header *psh;						// pseudo_header 구조체 선언
 	psh = (struct pseudo_header *)malloc(sizeof(pseudo_header));
-<<<<<<< HEAD
 	memcpy(&psh->ip_dst_addr, &ih->ip_dst_addr, sizeof(ih->ip_dst_addr));
 	memcpy(&psh->ip_src_addr, &ih->ip_src_addr, sizeof(ih->ip_src_addr));
-	psh->placeholder = 0x00;										// Reserve �׻� 0
-	psh->protocol = ih->ip_protocol;								// IP ��������	
-=======
-	psh->ip_dst_addr = ih->ip_dst_addr;								// IP 도착지
-	psh->ip_src_addr = ih->ip_src_addr;								// IP 시작지
-	psh->placeholder = 0x00;										// Reserve 항상 0
-	psh->protocol = ih->ip_protocol;								// IP 프로토콜	
->>>>>>> origin/master
+	psh->placeholder = 0x00;
+	psh->protocol = ih->ip_protocol;
+	psh->ip_dst_addr = ih->ip_dst_addr;	
+	psh->ip_src_addr = ih->ip_src_addr;
+	psh->placeholder = 0x00;
+	psh->protocol = ih->ip_protocol;
+
 	psh->tcp_length = sizeof(tcp_header) + (u_short)strlen(Data); // TCP header + Data len
 																  /* TCP checksum */
 	tcp_checksum_backward(tcp, psh, header);
@@ -54,10 +52,10 @@ int packet_handler_backward(pcap_t *fp, u_char *pkt_data, struct pcap_pkthdr *he
 	packet = (u_char *)malloc(packet_size);
 	memcpy(packet, pkt_data, 14);							// Ethernet
 	memcpy(packet + 14, ih, 20);		// IP
-	memcpy(packet + 34, tcp, 20);	// TCP
-	memcpy(packet + 54, Data, strlen(Data));				// Data
+	memcpy(packet + 34, tcp, 20);		// TCP
+	memcpy(packet + 54, Data, strlen(Data));// Data
 
-															/* Send packet */
+	/* Send packet */
 	pcap_sendpacket(fp, packet, packet_size);
 	free(packet);
 	free(psh);
@@ -72,7 +70,7 @@ void ip_checksum_backward(struct ip_header *ih)
 	ih->ip_src_addr = ih->ip_dst_addr;
 	ih->ip_dst_addr = temp;
 
-	ih->ip_total_length = 0x2F00;		// 0x2F00 추후에 ntohs수정
+	ih->ip_total_length = 0x2F00;
 
 	u_short *p = (u_short *)ih;
 	u_int sum = 0;
